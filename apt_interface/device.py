@@ -40,8 +40,10 @@ class Device:
         bytes_array = pack("<HBBBB", func, param1, param2, self.dest, self.src)
         return self.ftdi.write_data(bytes_array) == 6
 
-    def write_with_data(self, func, data_length, data) -> bool:
-        bytes_array = pack("<HBBBBHH", func, data_length, self.dest|0x80, self.src, data)
+    def write_with_data(self, func, data_length: int, data: bytes) -> bool:
+        bytes_array = data + pack("<HHBB", func, data_length, self.dest|0x80, self.src)
+
+        print("test")
         return self.ftdi.write_data(bytes_array) == (6 + data_length)
 
     def end_connection(self) -> None:
