@@ -4,4 +4,4 @@ with KPZ101() as kpz:
     print(kpz.conf.name)
     print(kpz.conf.serial_nm)
     print(kpz.conf.mode)
-    print(kpz.identify())
+    kpz.identify()

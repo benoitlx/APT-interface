@@ -46,7 +46,7 @@ class KPZ101():
 
     def __enter__(self) -> KPZ101:
         self.dev.begin_connection()
-        #self.set_io()
+        self.set_io()
         self.set_mode()
         return self
     

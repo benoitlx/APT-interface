@@ -1,5 +1,5 @@
 name: X_axis_controller
 serial_nm: "29501986"
 baudrate: 115200
-mode: close_loop
+mode: closed_loop
 feedback_in: chann2
