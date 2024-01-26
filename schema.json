@@ -1,0 +1,64 @@
+{
+    "description": "Description du fichier yaml",
+    "properties": {
+        "name": {
+            "default": "KPZ101_default_controller",
+            "title": "Name",
+            "type": "string"
+        },
+        "serial_nm": {
+            "pattern": "^29.*",
+            "title": "Serial Nm",
+            "type": "string"
+        },
+        "baudrate": {
+            "default": 115200,
+            "enum": [
+                110,
+                300,
+                600,
+                1200,
+                2400,
+                4800,
+                9600,
+                14400,
+                19200,
+                38400,
+                57600,
+                115200,
+                128000
+            ],
+            "title": "Baudrate",
+            "type": "integer"
+        },
+        "mode": {
+            "default": "open_loop",
+            "enum": [
+                "open_loop",
+                "closed_loop"
+            ],
+            "title": "Mode",
+            "type": "string"
+        },
+        "feedback_in": {
+            "default": "chann2",
+            "title": "Feedback In",
+            "type": "string"
+        },
+        "voltage_limit": {
+            "default": 75,
+            "enum": [
+                75,
+                100,
+                150
+            ],
+            "title": "Voltage Limit",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "serial_nm"
+    ],
+    "title": "KPZ101Config",
+    "type": "object"
+}

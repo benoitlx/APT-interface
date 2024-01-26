@@ -1,41 +1,27 @@
 from .device import Device
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, Field, ValidationInfo
 from pydantic_yaml import parse_yaml_file_as
-from apt_interface import baud_rates
+from apt_interface import VALID_BAUDRATES
 from struct import pack
+from typing import Iterable
+from typing import Literal, Annotated
+
 
 class KPZ101Config(BaseModel):
     """Description du fichier yaml"""
 
     name: str = "KPZ101_default_controller"
-    serial_nm: str
-    baudrate: int = 115200
-    mode: str = "open"
+    serial_nm: Annotated[str, Field(pattern=r"^29.*")]
+    baudrate: VALID_BAUDRATES = 115200
+    mode: Literal["open_loop", "closed_loop"] = "open_loop"
     feedback_in: str = "chann2"
-    voltage_limit: int = 75
+    voltage_limit: Literal[75, 100, 150] = 75
 
-    @validator("serial_nm")
-    def _chk_sn(cls, sn: str) -> str:
-        assert sn[:2] == "29", 'Invalid Serial Number: KPZ101 needs to start with 29'
-        return sn
+    @field_validator("feedback_in")
+    def _chk_feedback(cls, f: str, v: ValidationInfo) -> str:
+        assert v.data["mode"] == "open_loop"
+        return f
     
-    @validator("baudrate")
-    def _chk_baud(cls, b: int) -> int:
-        assert b in baud_rates, 'Invalid Baudrate'
-        return b
-    
-    # TODO
-    # validator for feedback_in
-    
-    @validator("mode")
-    def _chk_mode(cls, m: str) -> str:
-        assert m in ["open_loop", "closed_loop"], 'Invalid Mode'
-        return m
-    
-    @validator("voltage_limit")
-    def _chk_v_lim(cls, v: int) -> int:
-        assert v in [75, 100, 150], 'Invalid output voltage limit'
-        return v
 
 class KPZ101():
     pass
@@ -77,6 +63,8 @@ class KPZ101():
         assert self.conf.mode == "open_loop", 'Cannot specify a voltage in open_loop mode'
         assert tension >= 0 and tension <= self.conf.voltage_limit, f'{tension} volt is not allowed'
 
+        # TODO: add an offset
+
         self.device_unit = int(32768/self.conf.voltage_limit)
         print(self.device_unit)
         data = pack("HH", 0x0001, int(tension * self.device_unit))
@@ -92,7 +80,7 @@ class KPZ101():
         self.dev.write(0x0210, 2, 0x02)
 
     def balayage(self, zoi, fonction, *args, **kwargs) -> None:
-        def reorganize(z) -> iter:
+        def reorganize(z) -> list[float]:
             """Reorganize the points to scan the nearest point first"""
             pass
 
@@ -105,3 +93,6 @@ class KPZ101():
         self.disable_output()
         self.dev.end_connection()
 
+if __name__ == "__main__":
+    with KPZ101() as kpz:
+        kpz.identify()

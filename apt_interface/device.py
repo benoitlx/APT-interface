@@ -7,14 +7,14 @@ class Device:
     pass
 
 class Device:
-    product_registred = False
+    product_registered = False
     dest = 0x50
     src = 0x01
 
     def __init__(self, sn: str, baud: int) -> None:
         """Initialize the device"""
         
-        if not self.product_registred:
+        if not self.product_registered:
             Ftdi.add_custom_product(Ftdi.DEFAULT_VENDOR, pid=0xfaf0) # watch udev rules !!!!
             Device.product_registred = True
 
@@ -34,9 +34,8 @@ class Device:
 
     def read_data(self) -> str:
         pass
-
     
-    def write(self, func, param1, param2) -> bool:
+    def write(self, func: bytes, param1: bytes, param2: bytes) -> bool:
         bytes_array = pack("<HBBBB", func, param1, param2, self.dest, self.src)
         return self.ftdi.write_data(bytes_array) == 6
 
