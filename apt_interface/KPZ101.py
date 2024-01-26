@@ -11,7 +11,7 @@ class KPZ101Config(BaseModel):
     serial_nm: str
     baudrate: int = 115200
     mode: str = "open"
-    feedback_in: str
+    feedback_in: str = "chann2"
     voltage_limit: int = 75
 
     @validator("serial_nm")
@@ -23,6 +23,9 @@ class KPZ101Config(BaseModel):
     def _chk_baud(cls, b: int) -> int:
         assert b in baud_rates, 'Invalid Baudrate'
         return b
+    
+    # TODO
+    # validator for feedback_in
     
     @validator("mode")
     def _chk_mode(cls, m: str) -> str:
@@ -46,6 +49,7 @@ class KPZ101():
 
     def __enter__(self) -> KPZ101:
         self.dev.begin_connection()
+        self.disable_output()
         self.set_io()
         self.set_mode()
         return self
@@ -69,8 +73,23 @@ class KPZ101():
 
         self.dev.write_with_data(0x07d4, 10, data)
 
-    def set_output_voltage(self, tension) -> None:
-        pass
+    def set_output_voltage(self, tension: float) -> None:
+        assert self.conf.mode == "open_loop", 'Cannot specify a voltage in open_loop mode'
+        assert tension >= 0 and tension <= self.conf.voltage_limit, f'{tension} volt is not allowed'
+
+        self.device_unit = int(32768/self.conf.voltage_limit)
+        print(self.device_unit)
+        data = pack("HH", 0x0001, int(tension * self.device_unit))
+
+        print(int(tension * self.device_unit))
+        self.dev.write_with_data(0x0643, 4, data)
+
+    def enable_output(self) -> None:
+        print("Warning High Voltage !!")
+        self.dev.write(0x0210, 2, 0x01)
+
+    def disable_output(self) -> None:
+        self.dev.write(0x0210, 2, 0x02)
 
     def balayage(self, zoi, fonction, *args, **kwargs) -> None:
         def reorganize(z) -> iter:
@@ -83,5 +102,6 @@ class KPZ101():
             fonction(*args, **kwargs) # écrire la mesure dans une matrice
 
     def __exit__(self, *exc_info) -> None:
+        self.disable_output()
         self.dev.end_connection()
 
