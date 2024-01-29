@@ -8,16 +8,16 @@ class Device:
     pass
 
 class Device:
-    product_registered = False
     dest = 0x50
     src = 0x01
 
     def __init__(self, sn: str, baud: int) -> None:
         """Initialize the device"""
         
-        if not self.product_registered:
+        try:
             Ftdi.add_custom_product(Ftdi.DEFAULT_VENDOR, pid=0xfaf0) # watch udev rules !!!!
-            Device.product_registred = True
+        except ValueError:
+            print("Can't register new pid, trying without") 
 
         self.ftdi = Ftdi()
         self.sn = sn
