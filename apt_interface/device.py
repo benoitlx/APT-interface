@@ -1,5 +1,6 @@
 from pyftdi.ftdi import Ftdi
 from struct import pack
+from time import sleep
 import logging
 import sys
 
@@ -32,8 +33,11 @@ class Device:
         self.begin_connection()
         return self
 
-    def read_data(self) -> str:
-        pass
+    def read_data(self, func: bytes, size: int) -> str:
+        self.write(func, 0x00, 0x00)
+
+        sleep(.005*size/90) # if you encounter reception problem, please increase the ratio 
+        return bytes(self.ftdi.read_data_bytes(size, attempt=2))
     
     def write(self, func: bytes, param1: bytes, param2: bytes) -> bool:
         bytes_array = pack("<HBBBB", func, param1, param2, self.dest, self.src)

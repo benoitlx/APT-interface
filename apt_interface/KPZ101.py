@@ -19,7 +19,7 @@ class KPZ101Config(BaseModel):
 
     @field_validator("feedback_in")
     def _chk_feedback(cls, f: str, v: ValidationInfo) -> str:
-        assert v.data["mode"] == "open_loop"
+        assert v.data["mode"] == "closed_loop"
         return f
     
 
@@ -64,6 +64,7 @@ class KPZ101():
         assert tension >= 0 and tension <= self.conf.voltage_limit, f'{tension} volt is not allowed'
 
         # TODO: add an offset
+        # FIXME: wrong ratoi when changing voltage limit
 
         self.device_unit = int(32768/self.conf.voltage_limit)
         print(self.device_unit)
@@ -79,6 +80,10 @@ class KPZ101():
     def disable_output(self) -> None:
         self.dev.write(0x0210, 2, 0x02)
 
+    def get_info(self) -> bytes:
+        """Return KPZ info, parsed as bytes"""
+        return self.dev.read_data(0x0005, 90)
+
     def balayage(self, zoi, fonction, *args, **kwargs) -> None:
         def reorganize(z) -> list[float]:
             """Reorganize the points to scan the nearest point first"""
@@ -87,7 +92,7 @@ class KPZ101():
         for coord in reorganize(zoi):
             # goto coord
 
-            fonction(*args, **kwargs) # écrire la mesure dans une matrice
+            fonction(*args, **kwargs) # typiquement: écrire la mesure dans une matrice
 
     def __exit__(self, *exc_info) -> None:
         self.disable_output()

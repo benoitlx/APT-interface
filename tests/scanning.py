@@ -21,7 +21,7 @@ with KPZ101(controller_fn) as x, KPZ101(controller_fn) as y:
 
     Autre idée:
 
-    with serial_com as pscm:
-        y.balayage(zoi_y, x.balayage(zoi_x, pscm.mesure))
+    with serial_com as spcm:
+        y.balayage(zoi_y, x.balayage(zoi_x, spcm.mesure))
     """
     pass
