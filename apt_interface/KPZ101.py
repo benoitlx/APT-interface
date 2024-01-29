@@ -28,7 +28,7 @@ class KPZ101():
 
 class KPZ101():
 
-    def __init__(self, config_file="config.yaml") -> None:
+    def __init__(self, config_file="config_KPZ.yaml") -> None:
         self.conf = parse_yaml_file_as(KPZ101Config, config_file)
 
         self.dev = Device(self.conf.serial_nm, self.conf.baudrate)

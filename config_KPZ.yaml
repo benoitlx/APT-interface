@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./schema.json
+# yaml-language-server: $schema=./schema_KPZ.json
 name: X_axis_controller
 serial_nm: "29501986"
 baudrate: 115200

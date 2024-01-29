@@ -4,7 +4,7 @@ import json
 
 #print(json.dumps(KPZ101Config.model_json_schema()))
 
-with KPZ101(config_file="config.yaml") as kpz:
+with KPZ101(config_file="config_KPZ.yaml") as kpz:
     print(kpz.conf)
 
     print(kpz.get_info())
