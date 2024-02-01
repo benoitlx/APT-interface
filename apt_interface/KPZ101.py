@@ -59,8 +59,9 @@ class KPZ101():
 
         self.dev.write_with_data(0x07d4, 10, data)
 
-    def set_output_voltage(self, tension: float) -> None:
-        assert self.conf.mode == "open_loop", 'Cannot specify a voltage in open_loop mode'
+    def set_output_voltage(self, tension: int) -> None:
+        """
+        assert self.conf.mode == "open_loop", 'Cannot specify a voltage in closed_loop mode'
         assert tension >= 0 and tension <= self.conf.voltage_limit, f'{tension} volt is not allowed'
 
         # TODO: add an offset
@@ -71,7 +72,19 @@ class KPZ101():
         data = pack("HH", 0x0001, int(tension * self.device_unit))
 
         print(int(tension * self.device_unit))
+        """
+        data = pack("HH", 0x0001, tension)
+        print(data)
         self.dev.write_with_data(0x0643, 4, data)
+
+    def set_position(self, pos: int) -> None:
+        assert self.conf.mode == "closed_loop", 'Cannot specify a position in open_loop mode'
+        assert pos >= 0 and pos <= 32767 # according to the documentation, negative values aren't used
+
+        data = pack("HH", 0x0001, pos)
+
+        self.dev.write_with_data(0x0646, 4, data)
+
 
     def enable_output(self) -> None:
         print("Warning High Voltage !!")

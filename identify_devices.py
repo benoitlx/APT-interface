@@ -8,11 +8,11 @@ with Device("29501986", 115200) as dev:
     print("should make the KPZ screen blink")
     print(dev.write(0x0223, 2, 0x00))
     
-sleep(8)
+# sleep(8)
 
 # KSG101
 with Device("59000407", 115200) as dev:
-    print("Wrinting")
+    print("Writing")
     print("should make the KSG screen blink")
     print(dev.write(0x0223, 2, 0x00))
         

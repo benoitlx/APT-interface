@@ -33,11 +33,11 @@ class Device:
         self.begin_connection()
         return self
 
-    def read_data(self, func: bytes, size: int) -> str:
-        self.write(func, 0x00, 0x00)
+    def read_data(self, func: bytes, size: int) -> bytes:
+        self.write(func, 0x00, 0x00) # request value
 
-        sleep(.005*size/90) # if you encounter reception problem, please increase the ratio 
-        return bytes(self.ftdi.read_data_bytes(size, attempt=2))
+        sleep(.01) # if you encounter reception problem, please increase the duration 
+        return bytes(self.ftdi.read_data_bytes(size, attempt=3)) # get value
     
     def write(self, func: bytes, param1: bytes, param2: bytes) -> bool:
         bytes_array = pack("<HBBBB", func, param1, param2, self.dest, self.src)

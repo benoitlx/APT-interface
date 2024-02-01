@@ -3,3 +3,4 @@ name: X_axis_gauge
 serial_nm: "59000407"
 baudrate: 115200
 out: chann2
+unit: pos 

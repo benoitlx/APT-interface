@@ -8,3 +8,9 @@ with KSG101(config_file="config_KSG.yaml") as ksg:
     print(ksg.conf)
 
     ksg.identify()
+
+    print(ksg.get_max_travel())
+
+    while True:
+        print(ksg.get_reading()) 
+        sleep(1)
