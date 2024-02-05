@@ -79,9 +79,9 @@ class KPZ101():
 
     def set_position(self, pos: int) -> None:
         assert self.conf.mode == "closed_loop", 'Cannot specify a position in open_loop mode'
-        assert pos >= 0 and pos <= 32767 # according to the documentation, negative values aren't used
+        # assert pos >= 0 and pos <= 32767 # according to the documentation, negative values aren't used
 
-        data = pack("HH", 0x0001, pos)
+        data = pack("Hh", 0x0001, pos)
 
         self.dev.write_with_data(0x0646, 4, data)
 
@@ -96,16 +96,6 @@ class KPZ101():
     def get_info(self) -> bytes:
         """Return KPZ info, parsed as bytes"""
         return self.dev.read_data(0x0005, 90)
-
-    def balayage(self, zoi, fonction, *args, **kwargs) -> None:
-        def reorganize(z) -> list[float]:
-            """Reorganize the points to scan the nearest point first"""
-            pass
-
-        for coord in reorganize(zoi):
-            # goto coord
-
-            fonction(*args, **kwargs) # typiquement: écrire la mesure dans une matrice
 
     def __exit__(self, *exc_info) -> None:
         self.disable_output()

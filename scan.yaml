@@ -1,0 +1,14 @@
+zoi: # zone of interest (define a parallelepiped)
+  ref_point: # the nearest point from (0, 0, 0) in the parallelepiped
+    - 200
+    - 300
+    - 10 
+  dimensions:
+    - 100
+    - 100
+    - 20     # put 0 if an axis is not used
+balayage:
+  step:
+    - 1
+    - 1
+    - 1 
