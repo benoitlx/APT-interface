@@ -9,20 +9,24 @@ class Scan():
     def __init__(self, axis: tuple[KPZ101], config_file="scan.yaml") -> None:
         self.axis = axis
 
-        self.mode = axis[0].conf.mode
+        # self.mode = axis[0].conf.mode
 
         # TODO: import yaml config with pydantic
         
-        self.X = self.conf.zoi.ref_point[0]
-        self.Y = self.conf.zoi.ref_point[1]
-        self.Z = self.conf.zoi.ref_point[2]
+        self.X = 0#self.conf.zoi.ref_point[0]
+        self.Y = 0#self.conf.zoi.ref_point[1]
+        self.Z = 0#self.conf.zoi.ref_point[2]
 
-        self.deltaX = self.conf.zoi.dimension[0]
-        self.deltaY = self.conf.zoi.dimension[1]
-        self.deltaZ = self.conf.zoi.dimension[2]
+        self.deltaX = 1#self.conf.zoi.dimension[0]
+        self.deltaY = 1#self.conf.zoi.dimension[1]
+        self.deltaZ = 1#self.conf.zoi.dimension[2]
 
         # Appeler la bonne fonction pour construire self.coords
-        self.coords = balayage(stepx, stepy, stepz)
+        # TODO: pattern matching sur le nom de la fonction
+        stepx = .01
+        stepy = .01
+        stepz = 1
+        self.coords = self.balayage(stepx, stepy, stepz)
 
     def scan(self, coords: np.ndarray[tuple], function, *args, **kwargs) -> np.ndarray:
         res = np.zeros(self.coords.size)
@@ -40,25 +44,25 @@ class Scan():
 
 
     def balayage(self, stepx, stepy, stepz) -> np.ndarray[tuple]:
-        coords = np.zeros(list(map(
-            lambda x: int(x[0]/x[1], 
-            zip(self.conf.zoi.dimension, self.conf.balayage.step))
-            )))
-        estimated_time = coords.size * self.conf.acquisition_time
+        coords = np.zeros(int(self.deltaZ/stepz*self.deltaY/stepy*self.deltaX/stepx), dtype=(float, 3))
+        estimated_time = coords.size * 1 # self.conf.acquisition_time
+        print(f"Temps estimé: {estimated_time}")
 
-        for i, z in enumerate(range(self.Z, self.Z + self.deltaZ)):
-            for j, y in enumerate(range(self.Y, self.Y + self.deltaY)):
-                for k, x in enumerate(range(self.X, self.X + self.deltaX)):
-                    index = i*stepz + j*stepy + k*stepx
-                    match i%2, j%2:
+        index = 0
+        for i, z in enumerate(np.linspace(self.Z, self.Z + self.deltaZ, int(self.deltaZ/stepz))):
+            for j, y in enumerate(np.linspace(self.Y, self.Y + self.deltaY, int(self.deltaY/stepy))):
+                for k, x in enumerate(np.linspace(self.X, self.X + self.deltaX, int(self.deltaX/stepx))):
+                    match (i%2, j%2):
                         case (0, 0):
                             coords[index] = (x, y, z)
                         case (0, 1):
                             coords[index] = (self.X+self.deltaX-x, y, z)
                         case (1, 0):
-                            coords[index] = (x, self.Y+self.deltaY-y, z)
-                        case (1, 1):
                             coords[index] = (self.X+self.deltaX-x, self.Y+self.deltaY-y, z)
+                        case (1, 1):
+                            coords[index] = (x, self.Y+self.deltaY-y, z)
+                    # print(f"{index=} {i=} {j=} {k=} {coords[index] = }")
+                    index += 1
 
         return coords
 

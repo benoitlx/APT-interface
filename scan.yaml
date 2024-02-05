@@ -6,9 +6,9 @@ zoi: # zone of interest (define a parallelepiped)
   dimensions:
     - 100
     - 100
-    - 20     # put 0 if an axis is not used
+    - 20
 balayage:
   step:
     - 1
     - 1
-    - 1 
+    - 1 # put same as dimensionz if not used
