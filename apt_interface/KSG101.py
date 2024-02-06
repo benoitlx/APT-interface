@@ -44,6 +44,16 @@ class KSG101():
 
         self.dev.write_with_data(0x07da, 14, data)
 
+    def get_io(self) -> None:
+        buffer = self.dev.read_data(0x07db, 20)
+
+        data = unpack("HHHHHHHHHH", buffer)
+        unit = data[5]
+        out = data[4]
+
+        print(f"{unit=}, {out=}")
+
+
     def get_reading(self) -> float:
         buffer = self.dev.read_data(0x07dd, 12)
 
