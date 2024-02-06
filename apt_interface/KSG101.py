@@ -61,12 +61,10 @@ class KSG101():
 
         return read
     
-    def get_max_travel(self) -> float:
+    def get_max_travel(self) -> None:
         buffer = self.dev.read_data(0x0650, 10)
 
-        read = unpack("HHHHH", buffer)[4]
-
-        return read
+        print(unpack("HHHHH", buffer)[4])
     
     def zeroing(self) -> None:
         self.dev.write(0x0658, 0, 0)

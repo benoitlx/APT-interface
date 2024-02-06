@@ -34,5 +34,5 @@ with KPZ101(config_file="config_KPZ.yaml") as kpz:
         sleep(3)
     """
 
-    # voltage_prompt(kpz)
-    sinus_voltage(kpz)
+    voltage_prompt(kpz)
+    # sinus_voltage(kpz)

@@ -6,6 +6,8 @@ from time import sleep
 with KSG101() as ksg, KPZ101() as kpz:
     print(ksg.conf)
     print(kpz.conf)
+    ksg.get_io() 
+    ksg.get_max_travel()
 
     kpz.enable_output()
     ksg.zeroing()

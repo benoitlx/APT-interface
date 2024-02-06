@@ -1,5 +1,6 @@
 from .KPZ101 import KPZ101
 import numpy as np
+from math import sin, cos, pi 
 
 # TODO: import pydantic
 # create a class ScanConfig with pydantic
@@ -10,6 +11,7 @@ class Scan():
         self.axis = axis
 
         # self.mode = axis[0].conf.mode
+        self.mode = "open_loop"
 
         # TODO: import yaml config with pydantic
         
@@ -17,28 +19,34 @@ class Scan():
         self.Y = 0#self.conf.zoi.ref_point[1]
         self.Z = 0#self.conf.zoi.ref_point[2]
 
-        self.deltaX = 1#self.conf.zoi.dimension[0]
-        self.deltaY = 1#self.conf.zoi.dimension[1]
+        self.deltaX = 32767#self.conf.zoi.dimension[0]
+        self.deltaY = 32767#self.conf.zoi.dimension[1]
         self.deltaZ = 1#self.conf.zoi.dimension[2]
 
         # Appeler la bonne fonction pour construire self.coords
         # TODO: pattern matching sur le nom de la fonction
-        stepx = .01
-        stepy = .01
+        stepx = self.deltaX/100 
+        stepy = self.deltaY/100 
         stepz = 1
-        self.coords = self.balayage(stepx, stepy, stepz)
 
-    def scan(self, coords: np.ndarray[tuple], function, *args, **kwargs) -> np.ndarray:
-        res = np.zeros(self.coords.size)
+        self.axis_number = 3 - (stepz == self.deltaZ) - (stepy == self.deltaY)
+        self.coords = self.balayage(stepx, stepy, stepz)
+        #self.coords = self.spiral(10000)
+
+    def scan(self, function, *args, **kwargs) -> np.ndarray:
+        res = np.zeros(self.coords.shape[0])
+        print(res.shape)
 
         for i, coord in enumerate(self.coords):
+            print(f"{i=}, {coord=}")
             for j, axis_coord in enumerate(coord):
-                if self.mode == "closed_loop":
-                    self.axis[j].set_position(axis_coord)
-                else:
-                    self.axis[j].set_output_voltage(axis_coord)
+                if j < self.axis_number:
+                    if self.mode == "closed_loop":
+                        self.axis[j].set_position(int(axis_coord))
+                    else:
+                        self.axis[j].set_output_voltage(int(axis_coord))
 
-                res[i] = function(args, kwargs)
+            res[i] = function(args, kwargs)
 
         return res
 
@@ -66,8 +74,19 @@ class Scan():
 
         return coords
 
-    def spiral(self) -> np.ndarray[tuple]:
-        pass
+    def spiral(self, tmax) -> np.ndarray[tuple]:
+        coords = np.zeros(tmax, dtype=(float, 2))
+
+        v = 2
+        w = 4 * pi / 100
+
+        rmid= v * tmax / 2
+
+        for i in range(tmax):
+            r = v * i / 2
+            coords[i] = (rmid + r*cos(w*i), rmid + r*sin(w*i)) 
+
+        return coords
 
 
     """

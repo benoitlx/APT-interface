@@ -74,7 +74,7 @@ class KPZ101():
         print(int(tension * self.device_unit))
         """
         data = pack("HH", 0x0001, tension)
-        print(data)
+
         self.dev.write_with_data(0x0643, 4, data)
 
     def set_position(self, pos: int) -> None:
