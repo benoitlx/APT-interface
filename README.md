@@ -6,13 +6,28 @@ A python module to interface lab equipment that communicate with the Thorlab APT
 
 > The pypi package is not published yet, it will be soon
 
+The package is based on the library [pyftdi](https://github.com/eblot/pyftdi) which uses `libusb 1.x` as a native dependency and thus should be installed.
+
+## Windows
+
+The easiest way is to install [zadig](https://zadig.akeo.ie/) (it will detect ftdi device automatically)
+
+## Linux
+
+```bash
+apt-get install libusb-1.0
+```
+
+### udev rules configuration
+
+Udev rules need to be created to communicate with devices without using administrator privileges.
+
+> TODO
+
+Finally, run the following command to install my package.
 ```bash
 pip install apt-interface
 ```
-
-## udev rules configuration
-
-> TODO
 
 # Usage
 
