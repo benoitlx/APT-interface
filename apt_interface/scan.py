@@ -77,7 +77,7 @@ class Scan():
     def spiral(self, tmax) -> np.ndarray[tuple]:
         coords = np.zeros(tmax, dtype=(float, 2))
 
-        v = 2
+        v = 8
         w = 4 * pi / 100
 
         rmid= v * tmax / 2
