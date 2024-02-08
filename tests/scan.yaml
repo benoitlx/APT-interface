@@ -1,15 +1,18 @@
 # yaml-language-server: $schema=./../json_schema/schema_scan.json
 zoi: # zone of interest (define a parallelepiped)
   ref_point: # the nearest point from (0, 0, 0) in the parallelepiped
-    X: 200
-    Y: 300
-    Z: 10 
+    X: 0 
+    Y: 0 
+    Z: null 
   dimensions:
-    X: 100
-    Y: 100
+    X: 32767 
+    Y: 32767
+    Z: null 
+scan_type: balayage
+acquisition_time: 0.1
 balayage:
   steps:
-    X: 1
-    Y: 1
-    Z: 1 
+    X: 100
+    Y: 100
+    Z: null 
 mode: "open_loop"

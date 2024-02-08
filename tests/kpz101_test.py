@@ -20,7 +20,7 @@ def sinus_voltage(kpz):
         sleep(.1)
 
 
-with KPZ101(config_file="config_KPZ.yaml") as kpz:
+with KPZ101(config_file="tests/config_KPZ.yaml") as kpz:
     print(kpz.conf)
 
     print(kpz.get_info())

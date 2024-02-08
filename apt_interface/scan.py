@@ -3,36 +3,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pydantic import BaseModel, validator
 from pydantic_yaml import parse_yaml_file_as
-from typing import Literal, Union
+from typing import Literal, Optional 
 from math import sin, cos, pi 
+from itertools import starmap
+
+
+# FIXME: validators need to be fixed
 
 class Point(BaseModel):
-    X: Union[int, None] = None
-    Y: Union[int, None] = None
-    Z: Union[int, None] = None
+    X: Optional[int] = None
+    Y: Optional[int] = None
+    Z: Optional[int] = None
 
-
-
-    @validator('X', 'Y', 'Z', pre=True, always=True)
-    def _chk_parameters(cls, v, values):
-        if v is not None:
-            return v
-        if any(values.get(field) is not None for field in ('X', 'Y', 'Z')):
-            return None
-        raise ValueError("At least one coordinate must be given")
+    # TODO: validator -> at least one attribute needs to be not None
 
 class ZoiConfig(BaseModel):
     ref_point: Point
     dimensions: Point
 
-    @validator('dimensions', pre=False, always=True)
-    def _chk_coherence(cls, v, values):
-        conv = lambda x: 1 if x is not None else x
-        simultaneously_None = lambda x, y: conv(x) == conv(y)
-        if any(simultaneously_None(v.__dict__.get(field), values["ref_point"].__dict__.get(field)) for field in ('X', 'Y', 'Z')):
-            return v
-        raise ValueError("No coherence between field ref_point and dimensions")
-    
+    # TODO: validator -> need a match between ref_point and dimensions
 
 class BalayageConfig(BaseModel):
     steps: Point
@@ -46,17 +35,11 @@ class ScanConfig(BaseModel):
     """Description du fichier yaml"""
 
     zoi: ZoiConfig
-    balayage: Union[BalayageConfig, None] = None
-    spirale: Union[SpiraleConfig, None] = None
+    scan_type: Literal["balayage", "spirale"]
+    balayage: Optional[BalayageConfig] = None
+    spirale: Optional[SpiraleConfig] = None
     mode: Literal["open_loop", "closed_loop"]
-
-    @validator('balayage', 'spirale', pre=True, always=True)
-    def _chk_parameters(cls, v, values):
-        if v is not None:
-            return v
-        if any(values.get(field) is not None for field in ('balayage', 'spirale')):
-            return None
-        raise ValueError("At least one coordinate must be given")
+    acquisition_time: float
 
 class Scan():
 
@@ -65,28 +48,28 @@ class Scan():
 
         self.conf = parse_yaml_file_as(ScanConfig, config_file)
 
-        # self.mode = axis[0].conf.mode
         self.mode = "open_loop"
 
-        # TODO: import yaml config with pydantic
-        
-        self.X = 0#self.conf.zoi.ref_point[0]
-        self.Y = 0#self.conf.zoi.ref_point[1]
-        self.Z = 0#self.conf.zoi.ref_point[2]
+        self.X = self.conf.zoi.ref_point.X
+        self.Y = self.conf.zoi.ref_point.Y
+        self.Z = self.conf.zoi.ref_point.Z
 
-        self.deltaX = 32767#self.conf.zoi.dimension[0]
-        self.deltaY = 32767#self.conf.zoi.dimension[1]
-        self.deltaZ = 32767#self.conf.zoi.dimension[2]
+        self.deltaX = self.conf.zoi.dimensions.X
+        self.deltaY = self.conf.zoi.dimensions.Y
+        self.deltaZ = self.conf.zoi.dimensions.Z
 
         # Appeler la bonne fonction pour construire self.coords
         # TODO: pattern matching sur le nom de la fonction
-        stepx = self.deltaX/10 
-        stepy = self.deltaY/10 
-        stepz = self.deltaZ/10 
+        match self.conf.scan_type:
+            case "balayage":
+                stepx = self.conf.balayage.steps.X
+                stepy = self.conf.balayage.steps.Y
+                stepz = self.conf.balayage.steps.Z
 
-        self.axis_number = 3 - (stepz == self.deltaZ) - (stepy == self.deltaY)
-        self.coords = self.balayage(stepx, stepy, stepz)
-        #self.coords = self.spiral(10000)
+                self.coords = self.balayage(stepx, stepy, stepz)
+            case "spirale":
+                # TODO: load conf
+                self.coords = self.spiral(10000)
 
     def scan(self, function, *args, **kwargs) -> np.ndarray:
         res = np.zeros(self.coords.shape[0])
@@ -95,7 +78,7 @@ class Scan():
         for i, coord in enumerate(self.coords):
             print(f"{i=}, {coord=}")
             for j, axis_coord in enumerate(coord):
-                if j < self.axis_number:
+                if axis_coord is not None:
                     if self.mode == "closed_loop":
                         self.axis[j].set_position(int(axis_coord))
                     else:
@@ -104,17 +87,40 @@ class Scan():
             res[i] = function(args, kwargs)
 
         return res
+    
 
+    def switch_axis(self, axis: str, n: list[int]) -> enumerate:
+        def manage_void_axis(arg1, arg2, arg3):
+            try:
+                res = enumerate(np.linspace(arg1, arg1 + arg2, arg3))
+            except TypeError:
+                res = enumerate([None]) 
+
+            for i, t in res:
+                print(i, t)
+            return res
+
+        match axis:
+            case 'X':
+                manage_void_axis(self.X, self.deltaX, n[0])
+            case 'Y':
+                manage_void_axis(self.Y, self.deltaY, n[1])
+            case 'Z':
+                manage_void_axis(self.Z, self.deltaZ, n[2])
 
     def balayage(self, stepx, stepy, stepz) -> np.ndarray[tuple]:
-        coords = np.zeros(int(self.deltaZ/stepz*self.deltaY/stepy*self.deltaX/stepx), dtype=(float, 3))
-        estimated_time = coords.size * 1 # self.conf.acquisition_time
+        n = [self.deltaX, self.deltaY, self.deltaZ]
+        n = list(starmap((lambda x, y: 1 if x is None else int(x/y)), zip([stepx, stepy, stepz], n)))
+        # n contains number of point per axis
+
+        coords = np.zeros(n[0]*n[1]*n[2], dtype=(float, 3))
+        estimated_time = coords.size * self.conf.acquisition_time
         print(f"Temps estimé: {estimated_time}")
 
         index = 0
-        for i, z in enumerate(np.linspace(self.Z, self.Z + self.deltaZ, int(self.deltaZ/stepz))):
-            for j, y in enumerate(np.linspace(self.Y, self.Y + self.deltaY, int(self.deltaY/stepy))):
-                for k, x in enumerate(np.linspace(self.X, self.X + self.deltaX, int(self.deltaX/stepx))):
+        for i, z in self.switch_axis('Z', n):
+            for j, y in self.switch_axis('Y', n):
+                for k, x in self.switch_axis('X', n):
                     match (i%2, j%2):
                         case (0, 0):
                             coords[index] = (x, y, z)

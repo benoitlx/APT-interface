@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    s = Scan((None))
+    s = Scan((None), config_file="tests/scan.yaml")
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
