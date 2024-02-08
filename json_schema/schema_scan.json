@@ -1,0 +1,112 @@
+{
+    "$defs": {
+        "BalayageConfig": {
+            "properties": {
+                "steps": {
+                    "$ref": "#/$defs/Point"
+                }
+            },
+            "required": [
+                "steps"
+            ],
+            "title": "BalayageConfig",
+            "type": "object"
+        },
+        "Point": {
+            "properties": {
+                "X": {
+                    "default": null,
+                    "title": "X",
+                    "type": "integer"
+                },
+                "Y": {
+                    "default": null,
+                    "title": "Y",
+                    "type": "integer"
+                },
+                "Z": {
+                    "default": null,
+                    "title": "Z",
+                    "type": "integer"
+                }
+            },
+            "title": "Point",
+            "type": "object"
+        },
+        "SpiraleConfig": {
+            "properties": {
+                "rmax": {
+                    "title": "Rmax",
+                    "type": "number"
+                },
+                "n": {
+                    "title": "N",
+                    "type": "integer"
+                },
+                "w": {
+                    "title": "W",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "rmax",
+                "n",
+                "w"
+            ],
+            "title": "SpiraleConfig",
+            "type": "object"
+        },
+        "ZoiConfig": {
+            "properties": {
+                "ref_point": {
+                    "$ref": "#/$defs/Point"
+                },
+                "dimensions": {
+                    "$ref": "#/$defs/Point"
+                }
+            },
+            "required": [
+                "ref_point",
+                "dimensions"
+            ],
+            "title": "ZoiConfig",
+            "type": "object"
+        }
+    },
+    "description": "Description du fichier yaml",
+    "properties": {
+        "zoi": {
+            "$ref": "#/$defs/ZoiConfig"
+        },
+        "balayage": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/BalayageConfig"
+                }
+            ],
+            "default": null
+        },
+        "spirale": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/SpiraleConfig"
+                }
+            ],
+            "default": null
+        },
+        "mode": {
+            "enum": [
+                "open_loop",
+                "closed_loop"
+            ],
+            "title": "Mode",
+            "type": "string"
+        }
+    },
+    "required": [
+        "zoi",
+        "mode"
+    ],
+    "title": "ScanConfig",
+    "type": "object"
+}

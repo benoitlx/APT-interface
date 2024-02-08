@@ -1,14 +1,69 @@
 from .KPZ101 import KPZ101
 import numpy as np
+import matplotlib.pyplot as plt
+from pydantic import BaseModel, validator
+from pydantic_yaml import parse_yaml_file_as
+from typing import Literal, Union
 from math import sin, cos, pi 
 
-# TODO: import pydantic
-# create a class ScanConfig with pydantic
+class Point(BaseModel):
+    X: Union[int, None] = None
+    Y: Union[int, None] = None
+    Z: Union[int, None] = None
+
+
+
+    @validator('X', 'Y', 'Z', pre=True, always=True)
+    def _chk_parameters(cls, v, values):
+        if v is not None:
+            return v
+        if any(values.get(field) is not None for field in ('X', 'Y', 'Z')):
+            return None
+        raise ValueError("At least one coordinate must be given")
+
+class ZoiConfig(BaseModel):
+    ref_point: Point
+    dimensions: Point
+
+    @validator('dimensions', pre=False, always=True)
+    def _chk_coherence(cls, v, values):
+        conv = lambda x: 1 if x is not None else x
+        simultaneously_None = lambda x, y: conv(x) == conv(y)
+        if any(simultaneously_None(v.__dict__.get(field), values["ref_point"].__dict__.get(field)) for field in ('X', 'Y', 'Z')):
+            return v
+        raise ValueError("No coherence between field ref_point and dimensions")
+    
+
+class BalayageConfig(BaseModel):
+    steps: Point
+
+class SpiraleConfig(BaseModel):
+    rmax: float 
+    n: int
+    w: float
+
+class ScanConfig(BaseModel):
+    """Description du fichier yaml"""
+
+    zoi: ZoiConfig
+    balayage: Union[BalayageConfig, None] = None
+    spirale: Union[SpiraleConfig, None] = None
+    mode: Literal["open_loop", "closed_loop"]
+
+    @validator('balayage', 'spirale', pre=True, always=True)
+    def _chk_parameters(cls, v, values):
+        if v is not None:
+            return v
+        if any(values.get(field) is not None for field in ('balayage', 'spirale')):
+            return None
+        raise ValueError("At least one coordinate must be given")
 
 class Scan():
 
     def __init__(self, axis: tuple[KPZ101], config_file="scan.yaml") -> None:
         self.axis = axis
+
+        self.conf = parse_yaml_file_as(ScanConfig, config_file)
 
         # self.mode = axis[0].conf.mode
         self.mode = "open_loop"
@@ -21,13 +76,13 @@ class Scan():
 
         self.deltaX = 32767#self.conf.zoi.dimension[0]
         self.deltaY = 32767#self.conf.zoi.dimension[1]
-        self.deltaZ = 1#self.conf.zoi.dimension[2]
+        self.deltaZ = 32767#self.conf.zoi.dimension[2]
 
         # Appeler la bonne fonction pour construire self.coords
         # TODO: pattern matching sur le nom de la fonction
-        stepx = self.deltaX/100 
-        stepy = self.deltaY/100 
-        stepz = 1
+        stepx = self.deltaX/10 
+        stepy = self.deltaY/10 
+        stepz = self.deltaZ/10 
 
         self.axis_number = 3 - (stepz == self.deltaZ) - (stepy == self.deltaY)
         self.coords = self.balayage(stepx, stepy, stepz)
@@ -66,9 +121,9 @@ class Scan():
                         case (0, 1):
                             coords[index] = (self.X+self.deltaX-x, y, z)
                         case (1, 0):
-                            coords[index] = (self.X+self.deltaX-x, self.Y+self.deltaY-y, z)
-                        case (1, 1):
                             coords[index] = (x, self.Y+self.deltaY-y, z)
+                        case (1, 1):
+                            coords[index] = (self.X+self.deltaX-x, self.Y+self.deltaY-y, z)
                     # print(f"{index=} {i=} {j=} {k=} {coords[index] = }")
                     index += 1
 
