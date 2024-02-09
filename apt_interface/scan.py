@@ -96,22 +96,21 @@ class Scan():
             except TypeError:
                 res = enumerate([None]) 
 
-            for i, t in res:
-                print(i, t)
             return res
 
         match axis:
             case 'X':
-                manage_void_axis(self.X, self.deltaX, n[0])
+                return manage_void_axis(self.X, self.deltaX, n[0])
             case 'Y':
-                manage_void_axis(self.Y, self.deltaY, n[1])
+                return manage_void_axis(self.Y, self.deltaY, n[1])
             case 'Z':
-                manage_void_axis(self.Z, self.deltaZ, n[2])
+                return manage_void_axis(self.Z, self.deltaZ, n[2])
 
     def balayage(self, stepx, stepy, stepz) -> np.ndarray[tuple]:
         n = [self.deltaX, self.deltaY, self.deltaZ]
-        n = list(starmap((lambda x, y: 1 if x is None else int(x/y)), zip([stepx, stepy, stepz], n)))
-        # n contains number of point per axis
+        n = list(starmap((lambda x, y: 1 if x is None else int(y/x)), zip([stepx, stepy, stepz], n)))
+        # n contains number of point per axis (if axis is not used, element will be set to 1)
+        print(n)
 
         coords = np.zeros(n[0]*n[1]*n[2], dtype=(float, 3))
         estimated_time = coords.size * self.conf.acquisition_time

@@ -3,16 +3,16 @@ zoi: # zone of interest (define a parallelepiped)
   ref_point: # the nearest point from (0, 0, 0) in the parallelepiped
     X: 0 
     Y: 0 
-    Z: null 
+    Z: 0 
   dimensions:
     X: 32767 
     Y: 32767
-    Z: null 
+    Z: 32767 
 scan_type: balayage
 acquisition_time: 0.1
 balayage:
   steps:
-    X: 100
-    Y: 100
-    Z: null 
+    X: 1000
+    Y: 1000
+    Z: 1000 
 mode: "open_loop"
