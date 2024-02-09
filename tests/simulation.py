@@ -6,7 +6,7 @@ from time import sleep
 #print(json.dumps(ScanConfig.model_json_schema()))
 
 def mesure(x, y):
-    sleep(1)
+    sleep(.1)
 
     return 1
 
@@ -17,4 +17,3 @@ print(s.conf.zoi.ref_point.Z)
 print(s.coords)
 
 s.visualize()
-s.scan()

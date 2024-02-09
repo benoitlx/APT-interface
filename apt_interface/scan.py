@@ -71,6 +71,13 @@ class Scan():
                 # TODO: load conf
                 self.coords = self.spiral(10000)
 
+        plt.ion()
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_zlabel('Z')
+
     def scan(self, function, *args, **kwargs) -> np.ndarray:
         res = np.zeros(self.coords.shape[0])
         print(res.shape)
@@ -80,31 +87,34 @@ class Scan():
             for j, axis_coord in enumerate(coord):
                 if axis_coord is not None:
                     if self.mode == "closed_loop":
-                        pass
-                        #self.axis[j].set_position(int(axis_coord))
+                        self.axis[j].set_position(int(axis_coord))
                     else:
-                        pass
-                        #self.axis[j].set_output_voltage(int(axis_coord))
-            #x, y, z = map((lambda l: 0 if l is None else l), coord)
-            #plt.plot(x, y, z)
+                        self.axis[j].set_output_voltage(int(axis_coord))
 
             res[i] = function(args, kwargs)
 
         return res
     
     def visualize(self) -> None:
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        X, Y, Z = zip(*self.coords)
+        default = np.zeros(len(X))
+        X, Y, Z = map((lambda l: default if np.isnan(l[0]).any() else l), [X, Y, Z])
 
-        x, y, z = zip(*self.coords)
-        default = np.zeros(len(x))
-        x, y, z = map((lambda l: default if np.isnan(l[0]).any() else l), [x, y, z])
+        self.ax.plot(X, Y, Z)
 
-        ax.plot3D(x, y, z)
+        plt.draw()
+        plt.pause(1)
 
-        ax.set_xlabel('X')
-        ax.set_xlabel('Y')
-        ax.set_xlabel('Z')
+        for coord in self.coords:
+            x, y, z = map((lambda l: 0 if np.isnan(l) else l), coord)
+            print(x, y, z)
+            self.ax.plot(X, Y, Z)
+            self.ax.scatter(x, y, z, c='red', marker='o', s=50)
+
+            plt.draw()
+            plt.pause(1)
+
+            self.ax.cla()
 
         plt.show()
 
