@@ -80,21 +80,40 @@ class Scan():
             for j, axis_coord in enumerate(coord):
                 if axis_coord is not None:
                     if self.mode == "closed_loop":
-                        self.axis[j].set_position(int(axis_coord))
+                        pass
+                        #self.axis[j].set_position(int(axis_coord))
                     else:
-                        self.axis[j].set_output_voltage(int(axis_coord))
+                        pass
+                        #self.axis[j].set_output_voltage(int(axis_coord))
+            #x, y, z = map((lambda l: 0 if l is None else l), coord)
+            #plt.plot(x, y, z)
 
             res[i] = function(args, kwargs)
 
         return res
     
+    def visualize(self) -> None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        x, y, z = zip(*self.coords)
+        default = np.zeros(len(x))
+        x, y, z = map((lambda l: default if np.isnan(l[0]).any() else l), [x, y, z])
+
+        ax.plot3D(x, y, z)
+
+        ax.set_xlabel('X')
+        ax.set_xlabel('Y')
+        ax.set_xlabel('Z')
+
+        plt.show()
 
     def switch_axis(self, axis: str, n: list[int]) -> enumerate:
-        def manage_void_axis(arg1, arg2, arg3):
+        def manage_void_axis(arg1: int, arg2: int, arg3: int) -> enumerate:
             try:
                 res = enumerate(np.linspace(arg1, arg1 + arg2, arg3))
             except TypeError:
-                res = enumerate([None]) 
+                res = enumerate([np.nan]) 
 
             return res
 
@@ -106,7 +125,7 @@ class Scan():
             case 'Z':
                 return manage_void_axis(self.Z, self.deltaZ, n[2])
 
-    def balayage(self, stepx, stepy, stepz) -> np.ndarray[tuple]:
+    def balayage(self, stepx: float, stepy: float, stepz: float) -> np.ndarray[tuple]:
         n = [self.deltaX, self.deltaY, self.deltaZ]
         n = list(starmap((lambda x, y: 1 if x is None else int(y/x)), zip([stepx, stepy, stepz], n)))
         # n contains number of point per axis (if axis is not used, element will be set to 1)
@@ -135,7 +154,7 @@ class Scan():
         return coords
 
     def spiral(self, tmax) -> np.ndarray[tuple]:
-        coords = np.zeros(tmax, dtype=(float, 2))
+        coords = np.zeros(tmax, dtype=(float, 3))
 
         v = 8
         w = 4 * pi / 100
@@ -144,7 +163,7 @@ class Scan():
 
         for i in range(tmax):
             r = v * i / 2
-            coords[i] = (rmid + r*cos(w*i), rmid + r*sin(w*i)) 
+            coords[i] = (rmid + r*cos(w*i), rmid + r*sin(w*i), None) 
 
         return coords
 
