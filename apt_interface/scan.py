@@ -8,7 +8,7 @@ from math import sin, cos, pi
 from itertools import starmap
 
 
-# FIXME: validators need to be fixed
+# FIXME: validators need to be fixed, do not publish to pypi until this is fix
 
 class Point(BaseModel):
     X: Optional[int] = None
@@ -59,7 +59,6 @@ class Scan():
         self.deltaZ = self.conf.zoi.dimensions.Z
 
         # Appeler la bonne fonction pour construire self.coords
-        # TODO: pattern matching sur le nom de la fonction
         match self.conf.scan_type:
             case "balayage":
                 stepx = self.conf.balayage.steps.X
@@ -71,12 +70,6 @@ class Scan():
                 # TODO: load conf
                 self.coords = self.spiral(10000)
 
-        plt.ion()
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111, projection='3d')
-        self.ax.set_xlabel('X')
-        self.ax.set_ylabel('Y')
-        self.ax.set_zlabel('Z')
 
     def scan(self, function, *args, **kwargs) -> np.ndarray:
         res = np.zeros(self.coords.shape[0])
@@ -96,11 +89,15 @@ class Scan():
         return res
     
     def visualize(self) -> None:
+        plt.ion()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
         X, Y, Z = zip(*self.coords)
         default = np.zeros(len(X))
         X, Y, Z = map((lambda l: default if np.isnan(l[0]).any() else l), [X, Y, Z])
 
-        self.ax.plot(X, Y, Z)
+        ax.plot(X, Y, Z)
 
         plt.draw()
         plt.pause(1)
@@ -108,13 +105,17 @@ class Scan():
         for coord in self.coords:
             x, y, z = map((lambda l: 0 if np.isnan(l) else l), coord)
             print(x, y, z)
-            self.ax.plot(X, Y, Z)
-            self.ax.scatter(x, y, z, c='red', marker='o', s=50)
+            ax.plot(X, Y, Z)
+            ax.scatter(x, y, z, c='red', marker='o', s=50)
+
+            ax.set_xlabel('X')
+            ax.set_ylabel('Y')
+            ax.set_zlabel('Z')
 
             plt.draw()
-            plt.pause(1)
+            plt.pause(self.conf.acquisition_time)
 
-            self.ax.cla()
+            ax.cla()
 
         plt.show()
 
@@ -164,6 +165,7 @@ class Scan():
         return coords
 
     def spiral(self, tmax) -> np.ndarray[tuple]:
+        # TODO: modify parameters to be coherent with conf file
         coords = np.zeros(tmax, dtype=(float, 3))
 
         v = 8
