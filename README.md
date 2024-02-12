@@ -20,8 +20,8 @@ apt-get install libusb-1.0
 
 ### udev rules configuration
 
-Udev rules need to be created to communicate with devices without using administrator privileges.
-A special `11-ftdi.rules` is available in the `rules` directory (it might be necessary to adapt if you want to use different devices than mine), you can copy it to `/etc/udev/rules.d` and run the following command as root :
+Udev rules need to be created to communicate with devices without using administrator privilege.
+A special `11-ftdi.rules` is available in the `rules` directory (it might be necessary to adapt it if you want to use different devices than mine), you can copy it to `/etc/udev/rules.d` and run the following command as root :
 
 ```bash
 udevadm control --reload-rules
@@ -72,7 +72,7 @@ with KPZ101(config_file="config_KPZ.yaml") as kpz:
     kpz.set_output_voltage(20) # The KPZ needs to be configured in open_loop for voltage control
 ```
 
-The full documentation is available [here](https://benoitlx.github.io/Documentation-Stage-G1/) (not finished yet, a dedicated page will be added)
+The full documentation is available [here](https://benoitlx.github.io/Documentation-Stage-G1/Technique/APT-interface) (not finished yet and only in french for now)
 
 Feel free to create pull requests and add support for other devices, i will try my best to review the code and merge changes in time! You can as well add issues for any problem you encounter with implemented functions. 
 The documentation for APT protocol is available [here](https://www.thorlabs.com/Software/Motion%20Control/APT_Communications_Protocol.pdf).
