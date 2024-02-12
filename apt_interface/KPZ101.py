@@ -24,7 +24,9 @@ class KPZ101Config(BaseModel):
     def _chk_feedback(cls, f: str, v: ValidationInfo) -> str:
         assert v.data["mode"] == "closed_loop"
         return f
-    
+
+# FIXME: plein de fonctions devrait retourner des booléens
+#        pour savoir si la fonction a bien été exécuté sur le KPZ 
 
 class KPZ101():
     pass
