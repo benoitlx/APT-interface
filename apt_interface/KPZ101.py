@@ -14,6 +14,9 @@ class KPZ101Config(BaseModel):
     serial_nm: Annotated[str, Field(pattern=r"^29.*")]
     baudrate: VALID_BAUDRATES = 115200
     mode: Literal["open_loop", "closed_loop"] = "open_loop"
+    # TODO: change model:
+    # move feedback_in in a submodel of mode
+
     feedback_in: Literal["chann2", "chann1", "extin"]
     voltage_limit: Literal[75, 100, 150] = 75
 
