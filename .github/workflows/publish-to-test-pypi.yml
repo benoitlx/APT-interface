@@ -8,7 +8,14 @@ on:
 
 jobs:
   build:
-    name: Build distribution 📦
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/APT-interface
+
+    permissions:
+      id-token: write # mandatory for trusted publishing
+  
+    name: Build distribution 📦 and publish to pypi
     runs-on: ubuntu-latest
 
     steps:
@@ -26,21 +33,7 @@ jobs:
     - name: Build package
       run: python -m build
 
-  publish-to-test-pypi:
-    name: Publish Python 🐍 distribution 📦 to TestPyPI 
-    needs:
-    - build
-    runs-on: ubuntu-latest
-
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/APT-interface
-
-    permissions:
-      id-token: write # mandatory for trusted publishing
-
-    steps:
-      - name: Publish distribution 📦 to TestPyPI 
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy
+    - name: Publish distribution 📦 to TestPyPI 
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy
