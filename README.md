@@ -52,8 +52,7 @@ Here is a simple configuration for a KPZ device
 name: X_axis_controller
 serial_nm: "29501986"
 baudrate: 115200
-mode: closed_loop
-feedback_in: chann2
+mode: open_loop 
 voltage_limit: 75 
 ```
 
