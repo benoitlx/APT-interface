@@ -1,4 +1,5 @@
 from pyftdi.ftdi import Ftdi
+from apt_interface import VALID_BAUDRATES
 from struct import pack
 from time import sleep
 import logging
@@ -11,7 +12,7 @@ class Device:
     dest = 0x50
     src = 0x01
 
-    def __init__(self, sn: str, baud: int) -> None:
+    def __init__(self, sn: str, baud: VALID_BAUDRATES) -> None:
         """Initialize the device"""
         
         try:
