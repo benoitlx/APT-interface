@@ -1,4 +1,3 @@
-
 from apt_interface.KSG101 import KSG101
 from apt_interface.KPZ101 import KPZ101
 from time import sleep
@@ -21,7 +20,7 @@ with KSG101() as ksg, KPZ101() as kpz:
     """
 
     while True:
-        p = int(input("desired position -32768..32767: "))
+        p = int(input("desired position 0..32767: "))
         kpz.set_position(p)
         sleep(2)
         print("reading -32768..32767: ", ksg.get_reading())

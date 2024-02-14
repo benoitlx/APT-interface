@@ -54,7 +54,8 @@ class KSG101():
         print(f"{unit=}, {out=}")
 
 
-    def get_reading(self) -> float:
+    def get_reading(self) -> float: 
+        # TODO: try with a return type of int
         buffer = self.dev.read_data(0x07dd, 12)
 
         read = unpack("HHHHhH", buffer)[4]

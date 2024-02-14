@@ -48,6 +48,7 @@ class Scan():
 
         self.conf = parse_yaml_file_as(ScanConfig, config_file)
 
+        # TODO: remove the line
         self.mode = "open_loop"
 
         self.X = self.conf.zoi.ref_point.X
