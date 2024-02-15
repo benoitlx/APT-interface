@@ -8,7 +8,7 @@ def mesure(*args, **kwargs):
     sleep(.01)
     return 1
 
-with KPZ101(config_file="x.yaml") as x, KPZ101(config_file="y.yaml") as y:
+with KPZ101(config_file="tests/x.yaml") as x, KPZ101(config_file="tests/y.yaml") as y:
     print(x.conf)
     print(y.conf)
 
@@ -16,7 +16,7 @@ with KPZ101(config_file="x.yaml") as x, KPZ101(config_file="y.yaml") as y:
     x.enable_output()
     y.enable_output()
 
-    s = Scan((x, y))
+    s = Scan((x, y), config_file="tests/scan.yaml")
 
     # Launching scan on nanomax
     m = s.scan(mesure)

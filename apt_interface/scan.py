@@ -79,7 +79,7 @@ class Scan():
         for i, coord in enumerate(self.coords):
             print(f"{i=}, {coord=}")
             for j, axis_coord in enumerate(coord):
-                if axis_coord is not None:
+                if not np.isnan(axis_coord):
                     if self.mode == "closed_loop":
                         self.axis[j].set_position(int(axis_coord))
                     else:

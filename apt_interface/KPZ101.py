@@ -3,7 +3,6 @@ from pydantic import BaseModel, field_validator, Field, ValidationInfo
 from pydantic_yaml import parse_yaml_file_as
 from apt_interface import VALID_BAUDRATES
 from struct import pack
-from typing import Iterable
 from typing import Literal, Annotated
 
 
@@ -17,7 +16,7 @@ class KPZ101Config(BaseModel):
     # TODO: change model:
     # move feedback_in in a submodel of mode
 
-    feedback_in: Literal["chann2", "chann1", "extin"]
+    feedback_in: Literal["chann2", "chann1", "extin"] = "chann2"
     voltage_limit: Literal[75, 100, 150] = 75
 
     @field_validator("feedback_in")
