@@ -47,9 +47,6 @@ class Scan():
 
         self.conf = parse_yaml_file_as(ScanConfig, config_file)
 
-        # TODO: remove the line
-        self.mode = "open_loop"
-
         self.X = self.conf.zoi.ref_point.X
         self.Y = self.conf.zoi.ref_point.Y
         self.Z = self.conf.zoi.ref_point.Z
@@ -67,7 +64,6 @@ class Scan():
 
                 self.coords = self.balayage(stepx, stepy, stepz)
             case "spirale":
-                # TODO: load conf
                 self.coords = self.spiral()
 
 
@@ -79,7 +75,7 @@ class Scan():
             print(f"{i=}, {coord=}")
             for j, axis_coord in enumerate(coord):
                 if not np.isnan(axis_coord):
-                    if self.mode == "closed_loop":
+                    if self.mode[j].conf.mode == "closed_loop":
                         self.axis[j].set_position(int(axis_coord))
                     else:
                         self.axis[j].set_output_voltage(int(axis_coord))
