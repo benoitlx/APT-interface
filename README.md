@@ -40,7 +40,7 @@ The easiest way is to install [zadig](https://zadig.akeo.ie/) (it will detect ft
 
 Finally, run the following command to install my package (only in test.pypi for now).
 ```bash
-pip install -i https://test.pypi.org/simple/ apt-interface
+pip install --extra-index-url https://test.pypi.org/simple/ apt-interface
 #pip install apt-interface
 ```
 
