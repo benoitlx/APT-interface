@@ -37,7 +37,6 @@ class ScanConfig(BaseModel):
     scan_type: Literal["balayage", "spirale"]
     balayage: Optional[BalayageConfig] = None
     spirale: Optional[SpiraleConfig] = None
-    mode: Literal["open_loop", "closed_loop"]
     acquisition_time: float
 
 class Scan():
