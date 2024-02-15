@@ -5,7 +5,7 @@ from time import sleep
 def mesure(*args, **kwargs):
     # il faut laisser assez de délais pour que les mouvements ne soient pas trop brusques
 
-    sleep(.05)
+    sleep(.02)
     return 1
 
 with KPZ101(config_file="tests/x.yaml") as x, \

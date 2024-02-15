@@ -27,8 +27,7 @@ class BalayageConfig(BaseModel):
     steps: Point
 
 class SpiraleConfig(BaseModel):
-    rmax: float 
-    n: int
+    v: float
     w: float
 
 class ScanConfig(BaseModel):
@@ -69,7 +68,7 @@ class Scan():
                 self.coords = self.balayage(stepx, stepy, stepz)
             case "spirale":
                 # TODO: load conf
-                self.coords = self.spiral(10000)
+                self.coords = self.spiral()
 
 
     def scan(self, function, *args, **kwargs) -> np.ndarray:
@@ -167,18 +166,20 @@ class Scan():
 
         return coords
 
-    def spiral(self, tmax) -> np.ndarray[tuple]:
-        # TODO: modify parameters to be coherent with conf file
+    def spiral(self) -> np.ndarray[tuple]:
+        tmax = int(self.conf.zoi.dimensions.X / self.conf.spirale.v)
+
         coords = np.zeros(tmax, dtype=(float, 3))
+        estimated_time = coords.size * self.conf.acquisition_time
+        print(estimated_time)
 
-        v = 8
-        w = 4 * pi / 100
-
-        rmid= v * tmax / 2
+        rmax = self.conf.zoi.dimensions.X / 2
+        centerX = self.conf.zoi.ref_point.X + rmax 
+        centerY = self.conf.zoi.ref_point.Y + rmax
 
         for i in range(tmax):
-            r = v * i / 2
-            coords[i] = (rmid + r*cos(w*i), rmid + r*sin(w*i), None) 
+            r = self.conf.spirale.v * i / 2
+            coords[i] = (centerX + r*cos(self.conf.spirale.w*i), centerY + r*sin(self.conf.spirale.w*i), None) 
 
         return coords
 

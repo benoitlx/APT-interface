@@ -8,15 +8,14 @@ zoi: # zone of interest (define a parallelepiped)
     X: 32767 
     Y: 32767 
     Z: null 
-scan_type: "balayage"
-acquisition_time: 0.01
+scan_type: "spirale"
+acquisition_time: 0.02
 balayage:
   steps:
     X: 1000
     Y: 1000
     Z: null 
 spirale:
-  rmax: 100
-  n: 10000
+  v: 50 
   w: 0.1256
 mode: "open_loop"
