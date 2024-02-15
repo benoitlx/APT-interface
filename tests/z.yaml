@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=./../json_schema/schema_KPZ.json
+name: Z_axis_controller
+serial_nm: "29501993"
+baudrate: 115200
+mode: open_loop
+voltage_limit: 75 
