@@ -6,8 +6,8 @@ zoi: # zone of interest (define a parallelepiped)
     Z: null 
   dimensions:
     X: 32767 
-    Y: 32767
-    Z: null
+    Y: 32767 
+    Z: null 
 scan_type: "balayage"
 acquisition_time: 0.01
 balayage:

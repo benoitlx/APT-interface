@@ -147,6 +147,8 @@ class Scan():
         estimated_time = coords.size * self.conf.acquisition_time
         print(f"Temps estimé: {estimated_time}")
 
+        add_none = lambda x, y, z: None if x is None or y is None else x+y-z
+
         index = 0
         for i, z in self.switch_axis('Z', n):
             for j, y in self.switch_axis('Y', n):
@@ -155,11 +157,11 @@ class Scan():
                         case (0, 0):
                             coords[index] = (x, y, z)
                         case (0, 1):
-                            coords[index] = (self.X+self.deltaX-x, y, z)
+                            coords[index] = (add_none(self.X, self.deltaX, x), y, z)
                         case (1, 0):
-                            coords[index] = (x, self.Y+self.deltaY-y, z)
+                            coords[index] = (x, add_none(self.Y, self.deltaY, y), z)
                         case (1, 1):
-                            coords[index] = (self.X+self.deltaX-x, self.Y+self.deltaY-y, z)
+                            coords[index] = (add_none(self.X, self.deltaX, x), add_none(self.Y, self.deltaY, y), z)
                     # print(f"{index=} {i=} {j=} {k=} {coords[index] = }")
                     index += 1
 

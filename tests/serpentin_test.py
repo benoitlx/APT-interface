@@ -20,7 +20,7 @@ with KPZ101(config_file="tests/x.yaml") as x, \
     y.enable_output()
     z.enable_output()
 
-    s = Scan((x, y, z), config_file="tests/scan.yaml")
+    s = Scan((x, y, None), config_file="tests/scan.yaml")
 
     # Launching scan on nanomax
     # s.visualize()
